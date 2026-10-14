@@ -8,6 +8,7 @@ import org.vaadin.example.vaadin_quixotic.ui.ModelStatusBanner;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.ai.orchestrator.AIOrchestrator;
 import com.vaadin.flow.component.ai.orchestrator.ResponseListener;
 import com.vaadin.flow.component.ai.provider.SpringAILLMProvider;
@@ -103,10 +104,15 @@ public class ChatView extends ExampleView {
 				// Runs on a background thread — marshal UI updates via ui.access.
 				.withResponseListener(event -> {
 					logTurn(event);
-					ui.access(() -> {
-						setGenerating(false);
-						messageField.focus();
-					});
+					try {
+						ui.access(() -> {
+							setGenerating(false);
+							messageField.focus();
+						});
+					} catch (UIDetachedException e) {
+						// The user navigated away or closed the tab while generation was in
+						// flight; there's no UI left to update.
+					}
 				})
 				.build();
 
