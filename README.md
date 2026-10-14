@@ -1,6 +1,6 @@
 # quixotic-vaadin
 
-UI examples for (https://qxotic.ai), built with [Vaadin](https://vaadin.com).
+UI examples for [Quixotic AI](https://qxotic.ai), built with [Vaadin](https://vaadin.com).
 
 <img width="1080" height="729" alt="vaadin-quixotic-ai-screenshot" src="https://github.com/user-attachments/assets/3228a213-542c-4b83-8b67-96ae04c60c63" />
 
