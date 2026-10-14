@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Project from https://pro.startvaadin.com/ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.1.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>org.vaadin.example</groupId>
+	<artifactId>vaadin-quixotic</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>vaadin-quixotic</name>
+	<description>Vaadin UI demo of the Quixotic AI examples, powered by Spring AI (local inference via Quixotic jinfer)</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<!-- Quixotic's jinfer requires Java 25 (heavy use of the incubator Vector API). -->
+		<java.version>25</java.version>
+		<!-- Aligned with the Spring AI version com.qxotic:jinfer-spring-ai:0.3.1 is built against. -->
+		<spring-ai.version>2.0.1</spring-ai.version>
+		<vaadin.version>25.3.1</vaadin.version>
+		<jinfer.version>0.3.1</jinfer.version>
+		<!-- Required at runtime by jinfer (native inference + Vector API). Applied to
+		     spring-boot:run and the test JVM below; pass the same flags when running the packaged jar. -->
+		<jinfer.jvm.args>--add-modules=jdk.incubator.vector --enable-native-access=ALL-UNNAMED</jinfer.jvm.args>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-dev</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+		</dependency>
+		<!-- Vaadin's AI integration (preview): AIOrchestrator + SpringAILLMProvider wire a
+		     MessageList/MessageInput to a Spring AI ChatModel, handling streaming, history and
+		     push. As of Vaadin 25.3.1 this module targets Spring AI 2.0.1 — the same version
+		     jinfer uses — so it is binary-compatible at runtime. Requires the
+		     com.vaadin.experimental.aiComponents feature flag. Used by ChatView. -->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-ai-core-flow</artifactId>
+		</dependency>
+
+		<!-- Quixotic (jinfer) as the Spring AI backend: local, in-JVM inference.
+		     The starter brings the Spring AI interfaces (ChatModel, EmbeddingModel,
+		     TextToSpeechModel, TranscriptionModel) and Jinfer's autoconfiguration. -->
+		<dependency>
+			<groupId>com.qxotic</groupId>
+			<artifactId>jinfer-spring-ai-spring-boot-starter</artifactId>
+		</dependency>
+		<!-- Model architectures used by this demo (weights download from Hugging Face on first use).
+		     Mirrors the Quixotic jbang examples. jinfer-models-all bundles every architecture,
+		     so no per-model module is needed: Llama (chat), Gemma-4 (vision + audio), Qwen3
+		     (embeddings), Inflect (TTS), Parakeet (ASR) are all included. -->
+		<dependency>
+			<groupId>com.qxotic</groupId>
+			<artifactId>jinfer-models-all</artifactId> <!-- Llama chat + Gemma-4 vision/audio + Qwen3 embed + Inflect TTS + Parakeet ASR -->
+		</dependency>
+		<dependency>
+			<groupId>com.qxotic</groupId>
+			<artifactId>jinfer-parakeet</artifactId>   <!-- Parakeet speech-to-text -->
+		</dependency>
+
+		<!-- Compute backends for Jam (quantized matmul). WITHOUT these, inference
+		     falls back to a scalar path and is unusably slow. jam-core only provides
+		     the API; a provider jar must be on the classpath and is picked via
+		     ServiceLoader (native preferred). jam-native ships optimized CPU kernels
+		     (including macOS arm64 / Apple Silicon) and relies on native access;
+		     jam-vector uses the Java Vector API (incubator module). Both required
+		     JVM flags are set via jinfer.jvm.args above. -->
+		<dependency>
+			<groupId>com.qxotic</groupId>
+			<artifactId>jam-native</artifactId>
+			<version>${jinfer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qxotic</groupId>
+			<artifactId>jam-vector</artifactId>
+			<version>${jinfer.version}</version>
+		</dependency>
+
+		<!-- Dynamic JavaScript loader: imports a plain classpath script at runtime (loaded
+		     once per UI) instead of @JsModule. Used by LiveTranscribeView for recorder.js. -->
+		<dependency>
+			<groupId>org.parttio</groupId>
+			<artifactId>vaadin-js-loader</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.qxotic</groupId>
+				<artifactId>jinfer-bom</artifactId>
+				<version>${jinfer.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<executions>
+					<execution>
+						<id>build-frontend</id>
+						<goals>
+							<goal>build-frontend</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- jinfer needs these flags in the forked run JVM. Requires a JDK that
+					     ships the Vector API incubator module (standard OpenJDK 25; note that
+					     some JREs/JBR builds omit jdk.incubator.vector). -->
+					<jvmArguments>${jinfer.jvm.args}</jvmArguments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

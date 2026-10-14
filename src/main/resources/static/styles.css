@@ -1,0 +1,26 @@
+.app-logo {
+    padding: var(--lumo-space-m, 1rem);
+}
+
+.app-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: var(--lumo-border-radius-m, 0.6em);
+    background: var(--lumo-primary-color, #4f46e5);
+    color: var(--lumo-primary-contrast-color, #ffffff);
+    font-weight: 700;
+    font-size: var(--lumo-font-size-l, 1.125rem);
+    letter-spacing: 0.04em;
+}
+
+.model-ref {
+    font-family: var(--lumo-font-family-monospace, monospace);
+    font-size: var(--lumo-font-size-s, 0.875rem);
+    color: var(--lumo-secondary-text-color, #5a5a5a);
+    background: var(--lumo-contrast-5pct, rgba(0, 0, 0, 0.05));
+    border-radius: var(--lumo-border-radius-m, 0.5em);
+    padding: 0.1em 0.5em;
+}
