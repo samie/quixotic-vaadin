@@ -11,7 +11,8 @@ inference runs entirely in Java.
 
 ## Requirements
 
-- Java 25
+- Java 25, with the `jdk.incubator.vector` module available (standard
+  OpenJDK 25 builds; some JRE/JBR distributions omit it)
 
 ## Running
 

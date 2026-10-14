@@ -143,6 +143,7 @@
 	</dependencyManagement>
 
 	<build>
+		<defaultGoal>spring-boot:run</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>com.vaadin</groupId>
