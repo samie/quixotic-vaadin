@@ -1,4 +1,4 @@
-# vaadin-quixotic
+# quixotic-vaadin
 
 UI examples for (https://qxotic.ai), built with [Vaadin](https://vaadin.com).
 
